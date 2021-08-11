@@ -1,367 +1,223 @@
-<!doctype html>
-<html lang="en">
-	<head>
-	<meta charset="UTF-8">
-	<title>魔方计时器</title>
-	</head>
-	<body onkeyup="begin(event)" onkeydown="stop(event)" onload="rndCube()">
-		<script src="newhome/testmobile.js"></script>
-		<script type="text/javascript">
-			var then; //used by show()
-			var nowDec;
-			var nowBest;
-			var nowWorst;
-			var running=0;// stopwatch status
-			var timeint;
-			var i=0;
+<!DOCTYPE html>
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>男某某与女某某日期纪念功能</title>
+	    
+        <link type="text/css" rel="stylesheet" href="./index_files/default.css">
+		<script type="text/javascript" src="./index_files/jquery.min.js"></script>
+		<script type="text/javascript" src="./index_files/jscex.min.js"></script>
+		<script type="text/javascript" src="./index_files/jscex-parser.js"></script>
+		<script type="text/javascript" src="./index_files/jscex-jit.js"></script>
+		<script type="text/javascript" src="./index_files/jscex-builderbase.min.js"></script>
+		<script type="text/javascript" src="./index_files/jscex-async.min.js"></script>
+		<script type="text/javascript" src="./index_files/jscex-async-powerpack.min.js"></script>
+		<script type="text/javascript" src="./index_files/functions.js" charset="utf-8"></script>
+		<script type="text/javascript" src="./index_files/love.js" charset="utf-8"></script>
+	    <style type="text/css">
+<!--
+.STYLE1 {color: #666666}
+-->
+        </style>
+</head>
+    <body>
+        <div id="main">
+            <div id="error">本页面采用HTML5编辑，目前您的浏览器无法显示，请换成谷歌(<a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a>)或者火狐(<a href="http://firefox.com.cn/download/">Firefox</a>)浏览器，或者其他游览器的最新版本。</div>
+            <div id="wrap">
+                <div id="text">
+			        <div id="code">
+			        	<span class="say">* 致女某某： *</span><br>
+						<span class="say"> </span><br>
+			        	<span class="say">· 女某某，情人节快乐！</span><br>
+						<span class="say"> </span><br>
+                        <span class="say">· 不经意相识, 或许是缘分，或许是注定的。</span><br>
+						<span class="say"> </span><br>
+			        	<span class="say">· 虽然.....，但......！</span><br>
+						<span class="say"> </span><br>
+			        	<span class="say">· 虽然......，但.......！</span><br>
+						<span class="say"> </span><br>
+			        	<span class="say">· 虽然......，但......！</span><br>
+						<span class="say"> </span><br>
+			        	<span class="say">· 虽然......</span><br>
+						<span class="say"> </span><br>
+			        	<span class="say">· 无论如何，只要你我依旧喜欢对方，我会一直陪着你。</span><br>
+                        <span class="say"> </span><br>
+                        <span class="say">· You are my only girlfriend.</span><br>
+						<span class="say"> </span><br>
+						<span class="say">· I love you,×××!</span><br>
+						<span class="say"> </span><br>
+                        <span class="say"><span class="space"></span>--@author 男某某--</span>
+			        </div>
+                </div>
+                <div id="clock-box">
+                    <span class="STYLE1">现在是</span>男某某 <span class="STYLE1" style="color: red">❤</span> 女某某<span class="STYLE1" style="color: red">相恋</span>
+                  <div id="clock"></div>
+              </div>
+                <canvas id="canvas" width="1100" height="680"></canvas>
+            </div>
+            
+        </div>
+    
+    <script>
+    </script>
 
-			var totalsec;
-			var sec;
-			var min;
-			var subsec;
-			var secdis;
-			var mindis;
-			var subsecdis;// the var above used by show(), is pretty much temp vars
-
-			var datas=new Array()// store the records
-			var nowSecondes;
-			var Max=25; //random cube steps
-			var arr=new Array();//random cube array
-			var myinterval=20; //interval for ie
-			if (navigator.userAgent.indexOf("Gecko")>-1) myinterval=10;
-
-			function stop(evt){// handle the keyup event
-				if (running==1 && evt.keyCode==32)
-				clearTimeout(timeint);
-			}
-
-			function toSeconds(dec){// convert the stopwatch display text to seconds	
-				var Ms;
-				var tmpDec=dec.split(":");
-				if(tmpDec[0]*10/10>0){
-					Ms=tmpDec[0]*60;
-					return (Ms+tmpDec[1]*10/10);
-				}else{
-					return (tmpDec[1]*10/10);
-				}
-			}
-
-			function begin(evt) // handle the keydown and reset event
-			{
-				if (evt.keyCode==32){
-					if (running==0){
-						then=new Date();
-						running=1;
-						show();
-					}else if (running==1){
-						running=2;
-						//document.getElementById("watch1").innerHTML=running;
-					}else {
-						//document.getElementById("watch1").innerHTML="ok";
-						ShowDatas(toSeconds(nowSeconds));
-						document.getElementById("watch").innerHTML="00:00.00";
-						running=0;
-					}
-				}
-			}
-
-			var a=0;
-
-			function ShowDatas(dec) {//push the record in array, display the nowBest and nowWorst and display the record table
-				if(dec==0){return false;}
-				if (dec!=-1){
-					var newDec=get2(dec);
-					datas.push(newDec);	
-				}
-				SortDatas();
-				ShowDetails();
-				var tempstraa=(datas.length!=0)?sec2minsec(nowBest):"";
-				spanBest.innerHTML="<b style=color:red>"+tempstraa+"</b>";
-				 tempstraa=(datas.length!=0)?sec2minsec(nowWorst):"";
-				spanWorst.innerHTML="<b>"+tempstraa+"</b>";
-				var tmp1=0;
-				for(i=0;i<datas.length;i++){
-					tmp1+=datas[i];
-				}
-				tempstraa=(datas.length!=0)?sec2minsec(get2(tmp1/datas.length)):"";
-				spanAv.innerHTML="<b>"+tempstraa+"</b>";
-			}
-
-			function sec2minsec(n){       // convert the seconds number in to **:**.** text format
-				if (n>60){
-					var tmpmins=Math.floor(n/60);
-					var	tmpseconds=get2(n-tmpmins*60);
-					var tmpstring;
-					if (tmpseconds<10){  
-						tmpstring=tmpmins+":0"+tmpseconds;
-					}else  
-						tmpstring=tmpmins+":"+tmpseconds;
-					return tmpstring;
-				}
-				else return n;
-			}
-
-			function ShowDetails() {	//display the record table
-				if(datas.length>12){a=datas.length -12;}
-				var tmpTd="<table cellspacing=1 bgcolor=olive><tr align=center bgcolor='#EEEEEE'><td width=50>1</td><td width=50>2</td><td width=50>3</td><td width=50>4</td><td width=50>5</td>";
-					tmpTd+="<td width=50>6</td><td width=50>7</td><td width=50>8</td><td width=50>9</td><td width=50>10</td><td width=50>11</td><td width=50>12</td></tr><tr bgcolor=white>";
-					for(i=a;i<(12+a);i++){
-						tmpTd+="<td align=center>";
-						if(datas[i]==undefined){tmpTd+="-";}
-						else{	
-							if(datas[i]==nowBest){   
-								tmpTd+="<font color=red><b>"+sec2minsec(datas[i])+"*</b></font>";
-							}else if (datas[i]==nowWorst){
-								tmpTd+="<font color=green>"+sec2minsec(datas[i])+"*</font>";
-							}else{  
-							  tmpTd+=sec2minsec(datas[i]); 
-							}
-						}	
-						tmpTd+="</td>";
-					}
-					tmpTd+="</tr></table>";
-					//alert(datas.join(","));
-					div1.innerHTML="";
-					div1.innerHTML=tmpTd;
-					rndCube();
-			}
-
-			function show() {	//show the stopwatch display, will run every 20 or 10 ms
-				var now=new Date();
-				diff=now.getTime()-then.getTime();
-				if (diff<1000)
-				{ 
-					mindis="00";
-					secdis="00";
-					subsec=Math.floor(diff/10);
-					if (subsec<10)
-						subsecdis="0"+subsec;
-					else 
-						subsecdis=subsec;
-				}else if (diff<60000){
-					mindis="00";
-					sec=Math.floor(diff/1000);
-					if(sec<10)
-						secdis="0"+sec;
-					else
-						secdis=sec;
-						subsec=Math.floor((diff%1000)/10);
-					if (subsec<10)
-						subsecdis="0"+subsec;
-					else 
-						subsecdis=subsec;
-				}else{
-					totalsec=Math.floor(diff/1000);//how many seconds?
-					sec=totalsec%60; //how many seconds-60*n
-					if(sec<10)
-					secdis="0"+sec;
-					else
-					secdis=sec;
-					min=(totalsec-sec)/60; //how many minutes?
-					if (min<10)
-					mindis="0"+min;
-					else
-					mindis=min;
-			
-					subsec=Math.floor((diff%1000)/10);
-					if (subsec<10)
-					subsecdis="0"+subsec;
-					else 
-					subsecdis=subsec;	
-				}
-				nowSeconds=mindis+":"+secdis+"."+subsecdis;
-				document.getElementById("watch").innerHTML=nowSeconds;
-				timeint=setTimeout("show()",myinterval)
-			}
+    <script>
+    (function(){
+        var canvas = $('#canvas');
 		
-			function get2(dec) //取两位小数点
-			{
-				return Math.round(dec*100)/100;
-			}
- 
-			function SortDatas(){//get max and min
-				var tmpArr=new Array();
-				for(i=0;i<datas.length;i++){
-					tmpArr[i]=datas[i];
-				}
-				tmpArr.sort(function(a,b){ return a-b;});
-				nowBest=tmpArr[0];
-				nowWorst=tmpArr[tmpArr.length-1];
-				// ShowBestAv();
-			}
+        if (!canvas[0].getContext) {
+            $("#error").show();
+            return false;
+        }
 
-			function mycls(){	 // clear all records
-				clearTimeout(timeint);
-				nowSeconds="00:00:00";
-				running=0;
-				datas=new Array(); 
-				ShowDetails();
-				document.getElementById("watch").innerHTML="00:00.00";
-			}
-		</script>
-		<script type="text/javascript">
-			function cancel()
-			{   clearTimeout(timeint);
-				nowSeconds="00:00:00";
-				running=0;
-				rndCube();
-				document.getElementById("watch").innerHTML="00:00.00";
-				//	alert("请点击一下网页上的任意空白处，让焦点从这个<不记录此次成绩>按钮上移开，即可开始新的一次计时。");
-			}
-			
-			function delrecord(){
-				clearTimeout(timeint);
-				nowSeconds="00:00:00";
-				running=0;
-				rndCube();
-				document.getElementById("watch").innerHTML="00:00.00";
-				datas.pop();
-				ShowDatas(-1);
-			}
-			
-			function isslice(move1,move2){//to judge if 2 moves are slice moves.
-				if (Math.floor(move1/2)==Math.floor(move2/2)) return true;
-				else return false;
-			}
-			
-			function checkmove(move){ 
-				if (move==arr[arr.length-1]) return true;
-			   	else if (move==arr[arr.length-2] && isslice(move,arr[arr.length-1])) return true;
-			   	else return false;
-			}
+        var width = canvas.width();
+        var height = canvas.height();
+        
+        canvas.attr("width", width);
+        canvas.attr("height", height);
 
-			function rndCube(){ 
-				var move="";
-				var rndMove=new Array("R","L","F","B","U","D");
-				var add=0;
-				var tmpRnd;
-				arr=new Array();
-				for (i=0;i<Max;i++){	
-					do {
-						tmpRnd=Math.floor(Math.random()*6);
-					}while (checkmove(tmpRnd))
-					arr.push(tmpRnd);
-				}
-				for(i=0;i<arr.length;i++){
-					var tmp=Math.floor(Math.random()*5);
-					if(tmp==4){	
-						move+=rndMove[arr[i]]+"2";}
-					else if(tmp==2 || tmp==3){	
-						move+=rndMove[arr[i]]+"'";}
-					else {	
-						move+=rndMove[arr[i]];}
-					move+=" ";
-				}
-				rndDiv.innerHTML=move;
-			}
-			
-			function exportrecord(){
-				clearTimeout(timeint);
-				nowSeconds="00:00:00";
-				running=0;
-				rndCube();
-				document.getElementById("watch").innerHTML="00:00.00";
-				if (datas.length<1){
-					alert("目前没有记录");
-					return false;
-				}
-				var temprec=datas.toString();
-				window.open("stopwatchsave.php?str="+temprec,"_self");
-			}
-			
-			function changebg(p)
-			{
-				for (i=1; i<4; i++){
-					document.getElementById("big"+i).style.color='blue';
-					document.getElementById("big"+i).style.textDecoration='underline';
-					document.getElementById("big"+i).style.backgroundColor='transparent';
-				}
-				document.getElementById("big"+p).style.color='black';
-				document.getElementById("big"+p).style.textDecoration='none';
-				document.getElementById("big"+p).style.backgroundColor='#FFCCFF';
-			}
+        var opts = {
+            seed: {
+                x: width / 2 - 20,
+                color: "rgb(190, 26, 37)",
+                scale: 2
+            },
+            branch: [
+                [535, 680, 570, 250, 500, 200, 30, 100, [
+                    [540, 500, 455, 417, 340, 400, 13, 100, [
+                        [450, 435, 434, 430, 394, 395, 2, 40]
+                    ]],
+                    [550, 445, 600, 356, 680, 345, 12, 100, [
+                        [578, 400, 648, 409, 661, 426, 3, 80]
+                    ]],
+                    [539, 281, 537, 248, 534, 217, 3, 40],
+                    [546, 397, 413, 247, 328, 244, 9, 80, [
+                        [427, 286, 383, 253, 371, 205, 2, 40],
+                        [498, 345, 435, 315, 395, 330, 4, 60]
+                    ]],
+                    [546, 357, 608, 252, 678, 221, 6, 100, [
+                        [590, 293, 646, 277, 648, 271, 2, 80]
+                    ]]
+                ]] 
+            ],
+            bloom: {
+                num: 700,
+                width: 1080,
+                height: 650,
+            },
+            footer: {
+                width: 1200,
+                height: 5,
+                speed: 10,
+            }
+        }
 
-			function buttonstuff(p){
-				document.getElementById(p).blur();
-				document.getElementById('watch').focus();
-			}
-		</script>
-		<style>
-			#cheney {
-					background:url(a.jpg) repeat 0 30px;
-					background-size:120px,90px;
-				}
-		</style>
-		<div id="cheney">
-		<center >
-			<div id="pc" >
-				<div id="watch" style="font-size:130px; font-family:Arial; font-weight:bold; color:navy; text-align:center">00:00.00</div>
-				<div id="mytext">
-					<div class="text">
-						用
-						<font color="#000080"><b>空格</b></font>
-						键
-						<b>开始</b>
-						(松开时触发)、
-						<b>停止</b>
-						(按下时触发)、
-						<b>复位</b>
-						(同时记录成绩)，enjoy：）
-						<a href="#" onclick="document.getElementById('mytext').style.display='none';this.blur();document.getElementById('watch').focus();return false;">
-							隐藏说明文字
-						</a> 
-					</div>
-					<div class="text">注意：某些时候，如刚打开此页后，
-						<font color="#FF0066">
-							如空格键不起作用，请先用鼠标点一下本页任意空白处
-						</font>，即可开始。
-						<span style="display:none;">
-							<script src="http://s96.cnzz.com/stat.php?id=351509&amp;web_id=351509" language="JavaScript">
-							</script>
-							<script src="http://c.cnzz.com/core.php?web_id=351509&amp;t=z" charset="utf-8" type="text/javascript">
-							</script>
-							<a href="https://www.cnzz.com/stat/website.php?web_id=351509" target="_blank" title="站长统计">
-								站长统计
-							</a>
-						</span>
-					</div>
-					<div class="text">请先最大化窗口或拉伸窗口使右边的滚动条不出现，否则空格键会让窗口滚动。</div>
-				</div>
-				<div id="rndDiv" style="margin-top:20px;font:12pt Arial;font-weight:bold">F L' D' R2 L' F R' U2 D' R' L' U D' R L' D2 U R B' R' L2 U D B2 R </div>
-				<div id="buttons">
-					<input type="button" class="btn1" value="DNF or POP 不记录此次成绩" id="notrecord1" onclick="cancel();buttonstuff('notrecord1');" title="DNF=Do Not Finish,POP=飞棱.若成绩已记入表格.请用右边清除上次成绩按钮。">
-					<input type="button" class="btn" value="清除上次成绩" id="delrecord1" onclick="delrecord();buttonstuff('delrecord1');">
-					<input type="button" class="btn" value="清除所有记录" id="clear1" onclick="mycls();buttonstuff('clear1')">
-					<input type="button" class="btn2" value="导出成绩到excel" id="exportrecord1" onclick=" exportrecord();buttonstuff('exportrecord1');">
-					<span style="display: inline;">秒表尺寸：
-						<a href="#" onclick="changebg(1);document.getElementById('watch').style.fontSize=200+'px';this.blur();document.getElementById('watch').focus();return false;" id="big1">大</a>，
-						<a href="#" onclick="changebg(2);document.getElementById('watch').style.fontSize=130+'px';this.blur();document.getElementById('watch').focus();return false;" id="big2" style="color: black; text-decoration: none; background-color: rgb(255, 204, 255);">中</a>，
-						<a href="#" onclick="changebg(3);document.getElementById('watch').style.fontSize=70+'px';this.blur();document.getElementById('watch').focus();return false;" id="big3">小</a>
-					</span>
-				</div>
-				<div id="div1"><table cellspacing="1" bgcolor="olive"><tbody><tr align="center" bgcolor="#EEEEEE"><td width="50">1</td><td width="50">2</td><td width="50">3</td><td width="50">4</td><td width="50">5</td><td width="50">6</td><td width="50">7</td><td width="50">8</td><td width="50">9</td><td width="50">10</td><td width="50">11</td><td width="50">12</td></tr><tr bgcolor="white"><td align="center"><font color="red"><b></b></font></td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td><td align="center">-</td></tr></tbody></table></div>
-				<div>
-					<table border="0">
-						<tbody>
-							<tr><td class="text1">最快:</td><td><span id="spanBest" class="text2"><b style="color:red">0.00</b></span></td></tr>
-							<tr><td class="text1">最慢:</td><td><span id="spanWorst" class="text2"><b>0.00</b></span></td></tr>
-							<tr><td class="text1">平均:</td><td><span id="spanAv" class="text2"><b>0.00</b></span></td></tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</center>
-		</div>
-		<script type="text/javascript">
-			document.getElementById("watch").focus();
-			document.getElementById("big2").style.color='black';
-			document.getElementById("big2").style.textDecoration='none';
-			document.getElementById("big2").style.backgroundColor='#FFCCFF';
-			if(testmobile()){
-				document.getElementById('pc').style.display="none";
-			}else{
-				document.getElementById('mobi').style.display="none";
-			}
-		</script>
-	</body>
+        var tree = new Tree(canvas[0], width, height, opts);
+        var seed = tree.seed;
+        var foot = tree.footer;
+        var hold = 1;
+
+        canvas.click(function(e) {
+            var offset = canvas.offset(), x, y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            if (seed.hover(x, y)) {
+                hold = 0; 
+                canvas.unbind("click");
+                canvas.unbind("mousemove");
+                canvas.removeClass('hand');
+            }
+        }).mousemove(function(e){
+            var offset = canvas.offset(), x, y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            canvas.toggleClass('hand', seed.hover(x, y));
+        });
+
+        var seedAnimate = eval(Jscex.compile("async", function () {
+            seed.draw();
+            while (hold) {
+                $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canScale()) {
+                seed.scale(0.95);
+                $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canMove()) {
+                seed.move(0, 2);
+                foot.draw();
+                $await(Jscex.Async.sleep(10));
+            }
+        }));
+
+        var growAnimate = eval(Jscex.compile("async", function () {
+            do {
+    	        tree.grow();
+                $await(Jscex.Async.sleep(10));
+            } while (tree.canGrow());
+        }));
+
+        var flowAnimate = eval(Jscex.compile("async", function () {
+            do {
+    	        tree.flower(2);
+                $await(Jscex.Async.sleep(10));
+            } while (tree.canFlower());
+        }));
+
+        var moveAnimate = eval(Jscex.compile("async", function () {
+            tree.snapshot("p1", 240, 0, 610, 680);
+            while (tree.move("p1", 500, 0)) {
+                foot.draw();
+                $await(Jscex.Async.sleep(10));
+            }
+            foot.draw();
+            tree.snapshot("p2", 500, 0, 610, 680);
+
+
+            canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
+            canvas.css("background", "#ffe");
+            $await(Jscex.Async.sleep(300));
+            canvas.css("background", "none");
+        }));
+
+        var jumpAnimate = eval(Jscex.compile("async", function () {
+            var ctx = tree.ctx;
+            while (true) {
+                tree.ctx.clearRect(0, 0, width, height);
+                tree.jump();
+                foot.draw();
+                $await(Jscex.Async.sleep(25));
+            }
+        }));
+       //下面修改起始日期
+        var textAnimate = eval(Jscex.compile("async", function () {
+		    var together = new Date();
+		    together.setFullYear(2021, 6, 20); 			//时间年月日 月份0~11
+		    together.setHours(22);						//小时	
+		    together.setMinutes(22);					//分钟
+		    together.setSeconds(2);					//秒前一位
+		    together.setMilliseconds(2);				//秒第二位
+
+		    $("#code").show().typewriter();
+            $("#clock-box").fadeIn(500);
+            while (true) {
+                timeElapse(together);
+                $await(Jscex.Async.sleep(1000));
+            }
+        }));
+
+        var runAsync = eval(Jscex.compile("async", function () {
+            $await(seedAnimate());
+            $await(growAnimate());
+            $await(flowAnimate());
+            $await(moveAnimate());
+
+            textAnimate().start();
+
+            $await(jumpAnimate());
+        }));
+
+        runAsync().start();
+    })();
+    </script>
+    <iframe src = "./彩虹_周杰伦.flac" allow = "autoplay" hidden /> //自己修改音乐位置
+</body>
 </html>
